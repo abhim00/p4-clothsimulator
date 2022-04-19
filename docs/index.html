@@ -1,0 +1,311 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<title>CS 184 Mesh Editor</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2022</h1>
+<h1 align="middle">Project 4: Cloth Simulator</h1>
+<h2 align="middle">Abhishek & Somya, CS184-284</h2>
+
+<br><br>
+
+<div>
+
+<h2 align="middle">Overview</h2>
+<p>We built a cloth simulator that is subject to many properties of physics as well as different visual effects that we show below. </p>
+
+<h2 align="middle">Part I: Masses and springs</h2>
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/pt1allconstraints.png" align="middle" width="400px"/>
+        <figcaption align="middle"><i>All constraints present.</i></figcaption>
+      </td>
+      <td>
+          <img src="images/pt1noshearing.png" align="middle" width="400px"/>
+          <figcaption align="middle"><i>No shearing constraints</i></figcaption>
+        </td>
+    </tr>
+    <tr>
+      <td>
+        <img src="images/pt1onlyshearing.png" align="middle" width="400px"/>
+        <figcaption align="middle"><i>Only shearing</i></figcaption>
+      </td>
+      <td>
+          <img src="images/pt1_finalcloth.png" align="middle" width="400px"/>
+          <figcaption align="middle"><i>Final Cloth</i></figcaption>
+        </td>
+    </tr>
+    <br>
+  </table>
+</div>
+
+
+<h2 align="middle">Part II: Simulation via numerical integration</h2>
+
+<br>
+<p>
+    The spring constant ks represents the stretchiness of the spring. A very low ks corresponds to an elastic spring, but a high ks represents a more stiff spring. When I set ks = 50, the cloth was very bouncy and stretchy, and took a long time to settle. When ks = 10000, the cloth is stiff and not as bouncy in the animation portion. As ks increases, the springs are more easily resistant to gravity.
+</p>
+<div align="middle">
+    <table style="width=100%">
+      <tr>
+        <td>
+          <img src="images/ks50.png" align="middle" width="400px"/>
+          <figcaption align="middle"><i> ks = 50N/m </i></figcaption>
+        </td>
+        <td>
+            <img src="images/ks10000.png" align="middle" width="400px"/>
+            <figcaption align="middle"><i>ks = 10000N/m</i></figcaption>
+          </td>
+      </tr>
+      <br>
+    </table>
+  </div>
+<p>
+    On the other hand as density increases (150 g/cm^2), cloth elasticity increases. As we increase the density, the point masses are heavier so the cloth is pushed downwards due to gravity. As density decreases (15 g/cm^2), the masses are lighter and the spring forces have a high impact on the cloth so it doesn't stretch to the ground as much.
+</p>
+<div align="middle">
+    <table style="width=100%">
+      <tr>
+        <td>
+          <img src="images/density15.png" align="middle" width="400px"/>
+          <figcaption align="middle"><i> density = 15g/cm^2 </i></figcaption>
+        </td>
+        <td>
+            <img src="images/density150.png" align="middle" width="400px"/>
+            <figcaption align="middle"><i>density = 150g/cm^2</i></figcaption>
+          </td>
+      </tr>
+      <br>
+    </table>
+  </div>
+
+<p>
+    We used Verlet integration to find the positions of point masses and added damping which corresponds to heat loss, friction, and other factors that cause the cloth to lose energy and momentum. As damping constant increases, the cloth falls even slower to a resting state. The cloth with higher damping coefficient does not change shape as much as with a lower damping coefficient as it falls. A lower damping coefficient (0%) is not good at resisting movement and takes a long time (forever) to settle. 
+</p>
+<br>
+
+<div align="middle">
+  <table style="width=100%">
+    <tr>
+      <td>
+        <img src="images/02damping.png" align="middle" width="400px"/>
+        <figcaption align="middle"><i>0.2% Damping</i></figcaption>
+      </td>
+      <td>
+          <img src="images/0damping.png" align="middle" width="400px"/>
+          <figcaption align="middle"><i>0 Damping</i></figcaption>
+        </td>
+    </tr>
+    <br>
+  </table>
+</div>
+
+<div align="middle">
+  <img src="images/pt2finalcloth.png" align="middle" width="600px"/>
+  <figcaption align="middle"><i>Final cloth</i></figcaption>
+</div>
+
+<br>
+
+<h2 align="middle">Part III: Handling collisions with other objects</h2>
+
+<p>
+  <div align="middle">
+    <table style="width=100%">
+      <tr>
+        <td>
+          <img src="images/ks=5000.png" align="middle" width="400px"/>
+          <figcaption align="middle"><i>ks = 5000.</i></figcaption>
+        </td>
+        <td>
+            <img src="images/sv=500.png" align="middle" width="400px"/>
+            <figcaption align="middle"><i>ks = 500.</i></figcaption>
+          </td>
+      </tr>
+      <tr>
+        <td>
+          <img src="images/sv=50000.png" align="middle" width="400px"/>
+          <figcaption align="middle"><i>ks = 50000.</i></figcaption>
+        </td>
+        <td>
+            <img src="images/pinkclothonplane.png" align="middle" width="400px"/>
+            <figcaption align="middle"><i>Pink cloth on plane.</i></figcaption>
+          </td>
+      </tr>
+      <br>
+    </table>
+  </div>
+</p>
+
+<h2 align="middle">Part IV: Handling self-collisions</h2>
+
+<p>
+  <div align="middle">
+    <table style="width=100%">
+      <tr>
+        <td>
+          <video controls="controls" width="500" height="500" name="Blue Cloth">
+            <source src="images/clothfallingdensity=15ks=5000.mov">
+          </video>
+          <figcaption align="middle"><i>Default density of 15g/cm^2 and ks = 5000.</i></figcaption>
+        </td>
+        <td>
+            <video controls="controls" width="500" height="500" name="Blue Cloth">
+              <source src="images/redclothdensity=15ks=600.mov">
+            </video>
+            <figcaption align="middle"><i>Default density of 15g/cm^2 and ks = 600.</i></figcaption>
+          </td>
+      </tr>
+      <tr>
+          <td>
+            <video controls="controls" width="500" height="500" name="Blue Cloth">
+                <source src="images/density1500ks=5000.mov">
+              </video>
+              <figcaption align="middle"><i>ks = 5000 and density = 1500g/cm^2.</i></figcaption>
+            </td>
+        <td>
+            <video controls="controls" width="500" height="500" name="Blue Cloth">
+                <source src="images/density=1500ks=600.mov">
+              </video>
+              <figcaption align="middle"><i>ks = 600 and density = 1500g/cm^2.</i></figcaption>
+        </td>
+      </tr>
+    </table>
+  </div>
+</p>
+  <p>
+    A higher density makes the cloth fall faster and crash into itself over and over more erratically. This occurs due to the cloth being heavier. In the other sense, making the cloth lighter allows it to fall more gently and uniformly. The surface appears smoother.
+  </p>
+  <p>
+      For higher ks values, we observe larger folds as the cloth falls. For smaller ks values, the cloth falls with a small fold each time. This partly caused by the self collision algorithm. 
+  </p>
+
+
+<h2 align="middle">Part V: Shaders</h2>
+
+<p>
+    A shader program offloads certain vertex and pixel sampling calculations to the GPU. In doing so, they speed up the graphics pipeline. A shader applies calculations to modify the position and normal of the vertex. From there a fragment shader could change color of pixel values and accurately calculate the light hitting a particular fragment and can cast the appropriate shadows or expected lighting effects. 
+<br>
+
+<br>
+The Blinn-Phong shading model has 3 parts. Ambient Lighting + Diffuse + Specular. Ambient comes from the intensity of the light source with no direction bias. The Diffuse component is the light reflected using a Lambertian shading model with light equally reflected in every direction. The Specular component comes from the direct reflection of the light source that reflects along the long side of the cloth. 
+</p>
+
+<p>
+    <div align="middle">
+      <table style="width=100%">
+          <tr>
+              <td>
+                  <img src="images/ambientonly.png" align="middle" width="400px"/>
+                  <figcaption align="middle"><i>Ambient light only.</i></figcaption>
+                </td>
+            <td>
+              <img src="images/diffuseonly.png" align="middle" width="400px"/>
+              <figcaption align="middle"><i>Diffuse light only.</i></figcaption>
+            </td>
+          </tr>
+        <tr>
+            <td>
+                <img src="images/specularonly.png" align="middle" width="400px"/>
+                <figcaption align="middle"><i>Specular light only.</i></figcaption>
+              </td>
+          <td>
+            <img src="images/fullphongmodel.png" align="middle" width="400px"/>
+            <figcaption align="middle"><i>Full Blinn-Phong model.</i></figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </p>
+
+  <p>
+      <div align="middle">
+        <table style="width=100%">
+                <img src="images/drake_texture.png" align="middle" width="600px"/>
+                <figcaption align="middle"><i>Drake texture mapping.</i></figcaption>
+              
+        </table>
+      </div>
+    </p>
+
+    <p>
+        <div align="middle">
+          <table style="width=100%">
+              <tr>
+                  <td>
+                      <img src="images/bumpmappingoncloth.png" align="middle" width="400px"/>
+                      <figcaption align="middle"><i>Bump mapping on cloth.</i></figcaption>
+                    </td>
+                <td>
+                  <img src="images/bumponsphere.png" align="middle" width="400px"/>
+                  <figcaption align="middle"><i>Bump mapping on sphere.</i></figcaption>
+                </td>
+              </tr>
+            
+          </table>
+        </div>
+      </p>
+
+      <p>
+        </p>
+
+        <p>
+            <div align="middle">
+              <table style="width=100%">
+                  <tr>
+                      <td>
+                          <img src="images/disp16.png" align="middle" width="400px"/>
+                          <figcaption align="middle"><i>Displacement mapping with resolution at 16.</i></figcaption>
+                        </td>
+                    <td>
+                      <img src="images/disp128.png" align="middle" width="400px"/>
+                      <figcaption align="middle"><i>Displacement mapping with resolution at 128.</i></figcaption>
+                    </td>
+                  </tr>
+                
+              </table>
+            </div>
+          </p>
+
+          <p>
+            The higher resolution sphere looks a little less course depending on the angle but also more course. I believe generally it should look more course but it depends on the texture you use. 
+          </p>
+
+          <p>
+              <div align="middle">
+                <table style="width=100%">
+                        <img src="images/mirror_shader.png" align="middle" width="600px"/>
+                        <figcaption align="middle"><i>Mirror mapping on sphere and cloth.</i></figcaption>
+                      
+                </table>
+              </div>
+            </p>
+
+<h2 align="middle">Part VI: Additional cloth simulation features!</h2>
+
+
+</body>
+</html>
